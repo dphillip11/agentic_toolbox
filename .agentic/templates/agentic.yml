@@ -4,6 +4,7 @@
 #   {{PROJECT_NAME}}    project name
 #   {{SETUP_STEPS}}     YAML steps that install toolchains/dependencies
 #   {{BUILD_COMMAND}}   build command ('true' if the project has no build step)
+#   {{LINT_COMMAND}}    lint/static-analysis command ('true' if none configured)
 #   {{TEST_COMMAND}}    test command
 #   {{DEFAULT_BRANCH}}  usually 'main'
 #
@@ -31,6 +32,9 @@ jobs:
 
       - name: Build
         run: {{BUILD_COMMAND}}
+
+      - name: Lint
+        run: {{LINT_COMMAND}}
 
       - name: Test
         run: {{TEST_COMMAND}}

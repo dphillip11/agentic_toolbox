@@ -51,14 +51,19 @@ re-confirm only if the plan changed materially.
 
 1. Write the agreed tests (they should fail meaningfully first)
 2. Implement the change
-3. Run the focused tests: `test_single` from env.json with `{path}` substituted
-4. On failure: diagnose, fix, rerun. If the *plan* turns out to be wrong
-   (not just the code), say so and return to gate 1 with a revised plan
-5. When focused tests pass, run the full suite (`test`), plus `lint` /
-   `typecheck` / `format` if defined
-6. Refresh the KB for every touched source file:
+3. **Validate syntax immediately**: run `lint_single` from env.json (with
+   `{path}` substituted) on every file you just edited — tests and
+   implementation alike. Fix lint/static errors before running any tests;
+   it is far cheaper than discovering a syntax error via a test run
+4. Run the focused tests: `test_single` from env.json with `{path}` substituted
+5. On failure: diagnose, fix, re-lint the fix (step 3), rerun. If the *plan*
+   turns out to be wrong (not just the code), say so and return to gate 1
+   with a revised plan
+6. When focused tests pass, run the full suite (`test`), plus project-wide
+   `lint` / `typecheck` / `format` if defined
+7. Refresh the KB for every touched source file:
    `python .agentic/scripts/kb_build.py --paths <files>`
-7. If the task surfaced durable knowledge (decisions, gotchas), record it via
+8. If the task surfaced durable knowledge (decisions, gotchas), record it via
    the `ingest` skill (notes)
 
 ## 5. Commit and PR — GATE 2

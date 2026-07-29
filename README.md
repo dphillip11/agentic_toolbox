@@ -5,7 +5,10 @@ any codebase, regardless of language or stack. It gives a coding agent three
 things it usually lacks:
 
 1. **An environment manifest** (`.agentic/env.json`) — the project's real
-   build/run/test/lint commands, gathered by interviewing you once.
+   build/run/test/lint commands, gathered by interviewing you once. If the
+   project has no linter/static analysis, initialisation offers to configure
+   one (ruff, biome/eslint, clang-tidy) so the agent can validate syntax
+   per-file during development.
 2. **An AST-derived knowledge base** (`.agentic/kb/`) — every source file
    decomposed into atomic elements (functions, classes, methods, imports,
    call references) via tree-sitter, plus a symbol index, per-module
@@ -36,23 +39,32 @@ install.sh            # copy the toolbox into a target repo
 
 ## Usage
 
+From the root of any codebase, run:
+
 ```sh
-./install.sh /path/to/your/repo
+curl -fsSL https://raw.githubusercontent.com/dphillip11/agentic_toolbox/main/install.sh | sh
 ```
 
-Then open your agent (opencode) in that repo and say "initialise this repo"
-— the `initialise` skill interviews you, indexes the existing codebase, and
-generates `.github/workflows/agentic.yml`.
+This copies the toolbox in (`.agentic/`, `skills/`, `opencode.jsonc`) and
+bootstraps the KB tooling in `.agentic/.venv`. Alternatively, from a local
+checkout: `./install.sh /path/to/your/repo`.
+
+Then open your agent (opencode) in that repo and say **"initialise this
+repo"** — the `initialise` skill interviews you, configures a linter if
+needed, indexes the existing codebase, and generates
+`.github/workflows/agentic.yml`.
 
 From then on, give it tasks normally; the `dev-task` skill drives the loop:
 
 - **Gather** — queries the KB instead of reading the codebase wholesale
 - **Test plan** — proposes test cases and edge cases; *you confirm*
-- **Develop** — implement, run focused tests, iterate until the suite is green
+- **Develop** — implement, lint each edited file to validate syntax, run
+  focused tests, iterate until the suite is green
 - **Ship** — *you confirm* the commit/PR, then it pushes and opens the PR
 
-On merge to the default branch, CI builds, tests, and recompiles changed
-files into the knowledge base, committing the update back with `[skip ci]`.
+On merge to the default branch, CI builds, lints, tests, and recompiles
+changed files into the knowledge base, committing the update back with
+`[skip ci]`.
 
 ## Language support
 
